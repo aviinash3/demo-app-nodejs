@@ -1,0 +1,30 @@
+name: Deploy to Digital Ocean
+on:
+  push:
+    branches: [main]
+jobs:
+  build:
+    name: Build Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.ACR_registry_url }}
+          username: ${{ secrets.ACR_USER }}
+          password: ${{ secrets.ACR_API_KEY }}
+
+      - name: Build, tag, and push image to azure-ACR
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          IMAGE: demo-nodejs
+        run: |
+          docker build -t ${{ secrets.ACR_registry_url }}/$IMAGE:$IMAGE_TAG .
+          docker push ${{ secrets.ACR_registry_url }}/$IMAGE:$IMAGE_TAG 
+  # deploy:
+  #   name: Deploy-k8s
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
