@@ -21,6 +21,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           IMAGE_NAME: demo-nodejs
         run: |
+          cd sample-nodeapp
           docker build -t ${{ secrets.ACR_registry_url }}/$IMAGE_NAME:$IMAGE_TAG .
           docker push ${{ secrets.ACR_registry_url }}/$IMAGE_NAME:$IMAGE_TAG 
   deploy:
