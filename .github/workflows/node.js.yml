@@ -44,12 +44,10 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           IMAGE_NAME: demo-nodejs
         run: |
-          helm upgrade --install nodeapp ./helm-charts/nodeapp \
-            --set imagePullSecrets.create=true \
-            --set imagePullSecrets.name=acr-pull-secret \
-            --set imagePullSecrets.dockerUsername=${{ secrets.ACR_USER }} \
-            --set imagePullSecrets.dockerPassword=${{ secrets.ACR_API_KEY }} \
-            --set imagePullSecrets.dockerServer=${{ secrets.ACR_REGISTRY_URL }} \
-            --set imagePullSecrets.dockerEmail=you@example.com \
+          helm upgrade --install nodeapp ./nodeapp \       
+            --set imagePullSecrets.create=false \
             --set image.repository=${{ secrets.ACR_REGISTRY_URL }}/$IMAGE_NAME \
             --set image.tag=$IMAGE_TAG
+
+
+
