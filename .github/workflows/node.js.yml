@@ -19,12 +19,36 @@ jobs:
       - name: Build, tag, and push image to azure-ACR
         env:
           IMAGE_TAG: ${{ github.sha }}
-          IMAGE: demo-nodejs
+          IMAGE_NAME: demo-nodejs
         run: |
-          docker build -t ${{ secrets.ACR_registry_url }}/$IMAGE:$IMAGE_TAG .
-          docker push ${{ secrets.ACR_registry_url }}/$IMAGE:$IMAGE_TAG 
-  # deploy:
-  #   name: Deploy-k8s
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
+          docker build -t ${{ secrets.ACR_registry_url }}/$IMAGE_NAME:$IMAGE_TAG .
+          docker push ${{ secrets.ACR_registry_url }}/$IMAGE_NAME:$IMAGE_TAG 
+  deploy:
+    name: Deploy to Kubernetes
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Set up Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+      - name: Deploy with Helm
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_NAME: demo-nodejs
+        run: |
+          helm upgrade --install nodeapp ./helm-charts/nodeapp \
+            --set imagePullSecrets.create=true \
+            --set imagePullSecrets.name=acr-pull-secret \
+            --set imagePullSecrets.dockerUsername=${{ secrets.ACR_USER }} \
+            --set imagePullSecrets.dockerPassword=${{ secrets.ACR_API_KEY }} \
+            --set imagePullSecrets.dockerServer=${{ secrets.ACR_REGISTRY_URL }} \
+            --set imagePullSecrets.dockerEmail=you@example.com \
+            --set image.repository=${{ secrets.ACR_REGISTRY_URL }}/$IMAGE_NAME \
+            --set image.tag=$IMAGE_TAG
