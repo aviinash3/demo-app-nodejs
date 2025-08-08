@@ -52,7 +52,7 @@ jobs:
           ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
         run: |
-          helm upgrade --install nodeapp ./helm-charts/nodeapp \       
+          helm upgrade --install nodeapp ./helm-charts/nodeapp \
             --set imagePullSecrets.create=false \
             --set image.repository=$ECR_REGISTRY/$ECR_REPOSITORY \
             --set image.tag=$IMAGE_TAG
