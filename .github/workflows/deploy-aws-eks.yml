@@ -50,10 +50,12 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.sha }}
           IMAGE_NAME: demo-nodejs
+          ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
         run: |
-          helm upgrade --install nodeapp ./nodeapp \       
+          helm upgrade --install nodeapp ./helm-charts/nodeapp \       
             --set imagePullSecrets.create=false \
-            --set image.repository=${{ secrets.ACR_REGISTRY_URL }}/$IMAGE_NAME \
+            --set image.repository=$ECR_REGISTRY/$ECR_REPOSITORY \
             --set image.tag=$IMAGE_TAG
 
 
