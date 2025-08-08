@@ -1,4 +1,4 @@
-name: Deploy AKS
+name: Deploy AWS-EKS
 on:
   workflow_dispatch:
 jobs:
